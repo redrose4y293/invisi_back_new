@@ -24,8 +24,32 @@ const corsOptions = {
     const allowed = config.corsOrigins;
     // If '*' is in allowed origins, allow all
     if (allowed.includes('*')) return cb(null, true);
-    // Check if the origin is in the allowed list
+    // Check if the origin is in the allowed list (exact match)
     if (allowed.includes(origin)) return cb(null, true);
+    
+    // Check if origin matches any allowed origins by hostname (supports IP addresses)
+    try {
+      const originUrl = new URL(origin);
+      const originHost = originUrl.hostname;
+      
+      for (const allowedOrigin of allowed) {
+        // If allowed origin is just an IP address, check if hostname matches
+        if (allowedOrigin === originHost) return cb(null, true);
+        
+        // If allowed origin is a URL, check if hostname matches
+        if (allowedOrigin.startsWith('http')) {
+          try {
+            const allowedUrl = new URL(allowedOrigin);
+            if (allowedUrl.hostname === originHost) return cb(null, true);
+          } catch (e) {
+            // Continue if URL parsing fails
+          }
+        }
+      }
+    } catch (e) {
+      // If origin URL parsing fails, continue with normal check
+    }
+    
     // In development, log the blocked origin for debugging
     if (config.env === 'development') {
       console.log(`CORS blocked origin: ${origin}. Allowed origins:`, allowed);
