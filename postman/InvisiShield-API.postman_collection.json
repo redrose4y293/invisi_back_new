@@ -1,0 +1,154 @@
+{
+  "info": {
+    "_postman_id": "c9d1d0a6-6a7f-4b86-86a1-7dc6f63e7c99",
+    "name": "InvisiShield API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Postman collection for InvisiShield Backend API"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080/api/v1" },
+    { "key": "accessToken", "value": "" },
+    { "key": "refreshToken", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /health/live",
+          "request": { "method": "GET", "url": "{{baseUrl}}/health/live" }
+        },
+        {
+          "name": "GET /health/ready",
+          "request": { "method": "GET", "url": "{{baseUrl}}/health/ready" }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "POST /auth/login",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"ChangeMe123!\"\n}" },
+            "url": "{{baseUrl}}/auth/login"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const data = pm.response.json();",
+                  "pm.collectionVariables.set('accessToken', data.accessToken || '');",
+                  "pm.collectionVariables.set('refreshToken', data.refreshToken || '');"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "POST /auth/refresh",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"refreshToken\": \"{{refreshToken}}\"\n}" },
+            "url": "{{baseUrl}}/auth/refresh"
+          }
+        },
+        {
+          "name": "POST /auth/logout",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ],
+            "url": "{{baseUrl}}/auth/logout"
+          }
+        },
+        {
+          "name": "POST /auth/request-password-reset",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@example.com\"\n}" },
+            "url": "{{baseUrl}}/auth/request-password-reset"
+          }
+        },
+        {
+          "name": "POST /auth/reset-password",
+          "request": {
+            "method": "POST",
+            "header": [ { "key": "Content-Type", "value": "application/json" } ],
+            "body": { "mode": "raw", "raw": "{\n  \"token\": \"<paste_token>\",\n  \"newPassword\": \"NewPassw0rd!\"\n}" },
+            "url": "{{baseUrl}}/auth/reset-password"
+          }
+        },
+        {
+          "name": "GET /auth/me",
+          "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ], "url": "{{baseUrl}}/auth/me" }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        { "name": "GET /users", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ], "url": { "raw": "{{baseUrl}}/users?limit=20", "host": ["{{baseUrl}}"], "path": ["users"], "query": [ {"key":"limit","value":"20"} ] } } },
+        { "name": "POST /users", "request": { "method": "POST", "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"email\": \"user@example.com\",\n  \"displayName\": \"User\",\n  \"roles\": [\"user\"]\n}" }, "url": "{{baseUrl}}/users" } },
+        { "name": "GET /users/:id", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ], "url": "{{baseUrl}}/users/1" } },
+        { "name": "PATCH /users/:id", "request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"displayName\": \"Updated\"\n}" }, "url": "{{baseUrl}}/users/1" } },
+        { "name": "DELETE /users/:id", "request": { "method": "DELETE", "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ], "url": "{{baseUrl}}/users/1" } }
+      ]
+    },
+    {
+      "name": "Content",
+      "item": [
+        { "name": "GET /content/pages", "request": { "method": "GET", "url": "{{baseUrl}}/content/pages?status=published&limit=20" } },
+        { "name": "GET /content/pages/:slug", "request": { "method": "GET", "url": "{{baseUrl}}/content/pages/example-slug" } },
+        { "name": "POST /content/pages", "request": { "method": "POST", "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"title\": \"Title\",\n  \"slug\": \"example-slug\",\n  \"body\": \"<h1>Hello</h1>\",\n  \"status\": \"draft\"\n}" }, "url": "{{baseUrl}}/content/pages" } },
+        { "name": "PATCH /content/pages/:id", "request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"status\": \"published\"\n}" }, "url": "{{baseUrl}}/content/pages/1" } }
+      ]
+    },
+    {
+      "name": "Uploads",
+      "item": [
+        { "name": "POST /uploads/signed-url", "request": { "method": "POST", "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"filename\": \"file.jpg\",\n  \"contentType\": \"image/jpeg\",\n  \"size\": 12345,\n  \"context\": \"reports\"\n}" }, "url": "{{baseUrl}}/uploads/signed-url" } },
+        { "name": "POST /uploads/complete", "request": { "method": "POST", "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"objectKey\": \"user/123/file.jpg\",\n  \"metadata\": {\n    \"contentType\": \"image/jpeg\",\n    \"size\": 12345,\n    \"context\": \"reports\"\n  }\n}" }, "url": "{{baseUrl}}/uploads/complete" } },
+        { "name": "GET /uploads/:id", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ], "url": "{{baseUrl}}/uploads/1" } }
+      ]
+    },
+    {
+      "name": "Installations",
+      "item": [
+        { "name": "POST /installations", "request": { "method": "POST", "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"siteName\": \"Site A\",\n  \"address\": {\"city\":\"NY\"},\n  \"customerInfo\": {\"name\":\"John\"},\n  \"scheduledAt\": \"2025-01-01T10:00:00Z\"\n}" }, "url": "{{baseUrl}}/installations" } },
+        { "name": "GET /installations", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ], "url": "{{baseUrl}}/installations?limit=20" } },
+        { "name": "GET /installations/:id", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ], "url": "{{baseUrl}}/installations/1" } },
+        { "name": "PATCH /installations/:id", "request": { "method": "PATCH", "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"status\": \"scheduled\",\n  \"notes\": \"Bring tools\"\n}" }, "url": "{{baseUrl}}/installations/1" } },
+        { "name": "POST /installations/:id/reports", "request": { "method": "POST", "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" }, { "key": "Content-Type", "value": "application/json" } ], "body": { "mode": "raw", "raw": "{\n  \"uploadObjectKey\": \"user/123/file.jpg\",\n  \"reportType\": \"site-photo\",\n  \"notes\": \"front view\"\n}" }, "url": "{{baseUrl}}/installations/1/reports" } }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        { "name": "GET /reports", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ], "url": "{{baseUrl}}/reports?installationId=1" } },
+        { "name": "GET /reports/:id", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ], "url": "{{baseUrl}}/reports/1" } },
+        { "name": "DELETE /reports/:id", "request": { "method": "DELETE", "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ], "url": "{{baseUrl}}/reports/1" } }
+      ]
+    },
+    {
+      "name": "Search",
+      "item": [
+        { "name": "GET /search", "request": { "method": "GET", "url": "{{baseUrl}}/search?q=hello&type=pages&limit=10" } },
+        { "name": "GET /search/suggest", "request": { "method": "GET", "url": "{{baseUrl}}/search/suggest?q=hel" } }
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        { "name": "GET /admin/stats", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ], "url": "{{baseUrl}}/admin/stats" } },
+        { "name": "GET /admin/events", "request": { "method": "GET", "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ], "url": "{{baseUrl}}/admin/events" } },
+        { "name": "POST /admin/users/:id/impersonate", "request": { "method": "POST", "header": [ { "key": "Authorization", "value": "Bearer {{accessToken}}" } ], "url": "{{baseUrl}}/admin/users/1/impersonate" } }
+      ]
+    }
+  ]
+}
