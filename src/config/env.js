@@ -5,9 +5,9 @@ const toList = (v) => (v ? v.split(',').map(s => s.trim()) : []);
 
 export const config = {
   env: process.env.NODE_ENV || 'development',
-  port: Number(process.env.PORT || 8080),
+  port: Number(process.env.PORT || 3000),
   corsOrigins: toList(process.env.CORS_ORIGINS || '*'),
-  appUrl: process.env.APP_URL || 'http://localhost:8080',
+  appUrl: process.env.APP_URL || 'http://localhost:3000',
   dbUrl: process.env.DATABASE_URL,
   jwt: {
     accessSecret: process.env.JWT_ACCESS_SECRET,

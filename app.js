@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import { config } from './src/config/env.js';
 import { notFound, errorHandler } from './src/utils/errors.js';
+import { requestLogger } from './src/middlewares/requestLogger.js';
 import apiRouter from './src/routes/index.js';
 
 const app = express();
@@ -68,6 +69,9 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(morgan('dev'));
 app.use(express.json({ limit: '2mb' }));
+
+// Custom request logger to show user information
+app.use(requestLogger);
 
 // Global rate limit for safety
 app.use(rateLimit({ windowMs: 60 * 1000, max: 120 }));
